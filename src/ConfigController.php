@@ -77,14 +77,21 @@ class ConfigController
         $grid = new Grid(new ConfigModel());
 
         $grid->id('ID')->sortable();
-        $grid->name()->display(function ($name) {
+
+        $grid->column('type', '类型')->using(ConfigModel::$typeMap);
+
+        $grid->column('name', '配置项')->display(function ($name) {
             return "<a tabindex=\"0\" class=\"btn btn-xs btn-twitter\" role=\"button\" data-toggle=\"popover\" data-html=true title=\"Usage\" data-content=\"<code>config('$name');</code>\">$name</a>";
         });
-        $grid->value();
+        
+        $grid->column('value', '配置值')->display(function ($value) {
+        	return $this->type == 'json' ? var_export(json_decode($value, true), true) : $value;
+        });
+        
         $grid->description();
 
         $grid->created_at();
-        $grid->updated_at();
+        //$grid->updated_at();
 
         $grid->filter(function ($filter) {
             $filter->disableIdFilter();
@@ -100,12 +107,16 @@ class ConfigController
         $form = new Form(new ConfigModel());
 
         $form->display('id', 'ID');
+
+        $form->select('type', '类型')->options(ConfigModel::$typeMap);
+
         $form->text('name')->rules('required');
         if (config('admin.extensions.config.valueEmptyStringAllowed', false)) {
             $form->textarea('value');
         } else {
             $form->textarea('value')->rules('required');
         }
+        
         $form->textarea('description');
 
         $form->display('created_at');

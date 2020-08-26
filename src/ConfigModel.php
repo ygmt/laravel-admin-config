@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class ConfigModel extends Model
 {
+	public static $typeMap = [
+		'string' => '字符串',
+		'json'  => 'json'
+	];
+
     /**
      * Settings constructor.
      *
